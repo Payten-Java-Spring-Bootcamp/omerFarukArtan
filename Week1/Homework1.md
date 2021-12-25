@@ -1,4 +1,4 @@
-# Ödev 2.1 
+# Ödev 1 
 
 ## 1. Pass by value, pass by reference kavramları nedir ? Java’ ile ilişkili olarak açıklayınız.
 
