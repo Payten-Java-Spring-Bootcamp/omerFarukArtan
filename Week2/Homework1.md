@@ -88,6 +88,33 @@ Not: Bu kısmı pek anlamadım.
 
 ![](https://sp-ao.shortpixel.ai/client/to_avif,q_glossy,ret_img,w_750/https://rojhat.com/wp-content/uploads/2021/02/URI-URL-ve-URN-Nedir-.jpg)
 
+### URI(UNİFORM RESOURCE IDENTİFİER)
 
+URI, bir adı veya kaynağı tanımlamak için kullanılan bir karakter dizisidir. Bir kaynağı konuma, ada veya her ikisine göre tanımlar.
+
+### URL(UNİFORM RESOURCE LOCATOR)
+
+URL, bir kaynağı tanımlayan ve aynı zamanda bu kaynağa ulaşmamız için gereken bilgiyi içeren bir URI’dır. Her URL aynı zamanda bir URI’dır ancak her URI, URL değildir. Örnek olarak, adınız bir URI olabilir, ancak adınız konumunuzu bulmaya yaramadığı için bir URL olamaz.
+
+### URN(UNİFORM RESOURCE NAME)
+
+URN, bir kaynağı benzersiz bir adla tanımlar, ancak bunun nerde bulunduğunu belirtmez. Tekrar etmek gerekirse, URL’lerden farklı olarak, URN’ler kaynağın konumunu belirtmez.
+
+
+![](https://ccnadesdecero.es/wp-content/uploads/2020/09/Partes-de-un-URI.png)
+
+  Yukarıdaki örnekte görüldüğü gibi URN kısmı book.html kaynağını benzersiz bir şekilde tanımlar ancak bu konumu bulmaya yetmediği için URL kısmı bundan daha geniş bir alana sahiptir. URI ise bunların tamamıdır.
+  
+## 10. Idempotency nedir ? Hangi HTTP metotları idempotent’ tir ?
+
+Idempotency'nin sağlanabilmesi için aynı metotlar farklı zamanlarda çağrıldığında, sunucu üzerinde aynı etkiye neden olmalıdır. GET, HEAD, PUT ve DELETE metotları idempotent'tır.
+
+![](https://19yw4b240vb03ws8qm25h366-wpengine.netdna-ssl.com/wp-content/uploads/Understanding-Idempotency-and-Safety-in-API-Design.png)
+
+## 11. RFC (Request For Comment) neyi ifade etmektedir ? HTTP hangi RFC dokümanında açıklanmıştır ? Bu dokümanda HTTP hakkında ne tür bilgiler yer almaktadır ?
+
+  RFC IETF tarafından internet standartları ve protokolleri için yayınlanan teknik yayınlardır. Bu standartlar belirlendikten sonra üzerine teknolojiler geliştirildiği için değişmesi mümkün olmayan yeni talepler sonrasında yeni versiyonları çıkan dökümanlardır.
+
+  HTTP RFC 7230 dökümanında açıklanmıştır. Bu dökümanda HTTP mimarisine ve ilgili terminolojisine genel bir bakış atılmış, "http" ve "https" Tekdüzen Kaynak Tanımlayıcı (URI) şemaları, HTTP/1.1 mesaj sözdizimini ve ayrıştırma gereksinimleri tanımlanmış ve uygulamalar için ilgili güvenlik endişelerini açıklanmış.
 
 
