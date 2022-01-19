@@ -62,4 +62,13 @@ Uygulama basit olduğu için service katmanı eklenmemiş. Uygulama için Spring
 
 ### Unit tests
 
+Testlerin temeli unit testlerden oluşacaktır. Unit test, kod tabanınızın belirli bir biriminin (test edilen konunuz) amaçlandığı gibi çalıştığından emin olur. 
+Unit testler kapsam olarak en dar kapsama sahiptir ve sayıca diğer test türlerinden daha fazla olacaktır.
+
+#### What's a Unit?
+
+Unit ten kastın ne olduğu çok kesin değildir. İşlevsel bir dilde çalışıyorsanız, bir birim büyük olasılıkla tek bir işlev olacaktır. Nesne yönelimli bir dilde bir birim, tek bir yöntemden tüm bir sınıfa kadar değişebilir.
+
+#### Sociable and Solitary
+
 
