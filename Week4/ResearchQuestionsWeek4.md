@@ -283,3 +283,59 @@ UI testleri, uygulamanızın kullanıcı arayüzünün doğru çalıştığını
   
 ---------------------------------------------------------------------
 
+### Regression test nedir ? Kısaca açıklayınız.
+
+  Regresyon testi canlıda çalışan kodun üzerinde yapılan değişikliklerin kontrolü için kullanılır. Bu değişiklikler yeni bir fonksiyon, hata çözümü ya da performans geliştirmesi olabilir. Regresyon testleri genellikle değişiklikler son aşamaya geldiğinde ve yazılımın yeni sürümü yayınlamadan önce gerçekleştirilir. Regresyon testlerinin öncelikli amacı, uygulamanın kritik alanlarının hala beklendiği gibi çalıştığını kontrol etmektedir. 
+    
+   Regresyon testleri:
+   - Yazılımın değişiklik sonrasında son kalitesinin kontrol edilmesini
+   - Daha önce çıkan hataların düzeldiğinin kontrolünü
+   - Yazılım ekibinin ürün hakkında güveninin artmasını sağlar
+
+### A/B test nedir ? Kısaca açıklayınız.
+   
+   A/B testinin amacı ikili karşılaştırmalarla farklı içerik ve tasarım örneklerini karşılaştırmayı ifade ediyor. Bu karşılaştırmanın amacı A/B testini uyguladığınız sisteme göre farklılık gösterebilir. Anasayfa, üyelik sayfası, satış sayfası, landing page ya da bülten için farklı A/B testleri uygulayabilir ve hedeflediğiniz eylemin(üye olma, satışa dönüş, tıklama..) değişimini takip edebilirsiniz.
+
+  Farklı test örneklerine yönlendireceğiniz kullanıcıları trafik yönlendiren sitelere göre ayırabilirsiniz. Örneğin arama motorundan gelen ziyaretçileri bir örneğe diğer kullanıcıları farklı bir örneğe yönlendirebilirsiniz. Bülten örneklerinde ise manuel tercihler yapmanız gerekecektir.
+
+![](https://cdn.webrazzi.com/uploads/2011/02/AB-Testi.jpg)
+
+### Black box / white box test kavramlarını açıklayınız.
+  
+  Kara kutu testleri; kodun yapısı(structure), tasarımı(design) ve uygulanışı(implementation) ile ilgilenmez. Kara kutu testlerinde girdi ve çıktı değişimine göre sistemin nasıl çalıştığı test edilir. Kara kutu test çeşitleri çoğu yazılım test uzmanı tarafından yaygın olarak kullanılan test çeşitleridir. Beyaz kutu testinde, kodun içine girilerek kodun doğruluğu ve kalitesi test edilir. Bu test türünde kod erişimi zorunludur. Kod yapısı ve tasarımına yönelik testler gerçekleştirilir. Örneğin, gereksiz bir kod bloğu tespit edilebilir veya kodun okunulabilirliğini arttırmaya yönelik durumlar tespit edilebilir. Kodda erken bulunacak hatalar Kara Kutu(Black Box) testlerini de kolaylaştırmaktadır. Beyaz kutu testleri çoğunlukla geliştiriciler tarafından yapıldığı gibi test uzmanları tarafından da uygulanabilir.
+  
+### Mutation test nedir ? Kısaca açıklayınız.
+   
+   Mutasyon Testi, kaynak koddaki belirli ifadeleri değiştirdiğimiz(mutant) ve test senaryolarının hataları bulabildiğini kontrol ettiğimiz bir tür yazılım testidir. Temelde birim testi(unit test) için kullanılan bir beyaz kutu testi türüdür. Mutant programdaki değişiklikler son derece küçük tutulur, bu nedenle programın genel hedefini etkilemez. Mutasyon testinin amacı, mutant kodunu kaldıracak kadar sağlam olması gereken test vakalarının kalitesini değerlendirmektir. Bu yöntem, programda bir hata oluşturmayı içerdiği için hata tabanlı test stratejisi olarak da adlandırılır.
+   
+### Behavior Driven Development (BDD) nedir, neyi amaçlamaktadır ?
+  
+  Behavior Driven development (BDD), yazılım süreçlerinin daha test odaklı gitmesini sağlayan bir yaklaşımdır. Aynı zamanda müşteri ile aramızda yaşayan bir döküman oluşmasını sağlayabilir. BDD, Test Driven Development (TDD) gibi prensip olarak öncelikle test kodları yazılsın daha sonrasında proje kodu yazılsın anlayışını benimsemektedir.
+  BDD’nin en güzel yanlarından biri konuşma dilinde test senaryoları yazmamıza olanak sağlamasıdır. İş analistleri müşteri ile yaptığı görüşmeler sonrasında ihtiyacı anlayarak user storyler oluşturmakta ve oluşturulan bu user storyler üzerinden de test senaryoları hazırlanarak koda dökülmektedir. Kısacası müşterinin ihtiyacı konuşma dilinde koda döküldüğü için müşteri ile ortak bir dilde buluşmaya olanak sağlayan bir yaklaşımdır aslında.
+ 
+#### BDD’nin Avantajları
+
+- İşbirliğini arttırır ve geliştirir. Konuşma dilinde test senaryoları yazıldığı için ekibe yeni katılan üyeler sürece çok çabuk adapte olabilir ve davranışsal senaryolar yazabilirler.
+- Kodun kalitesini artırarak temelde bakım maliyetini düşürür ve proje riskleri en aza indirilir.
+- Müşterinin ihtiyacına yönelik belirlenen user storyler aracılığıyla test senaryoları oluşturulup koda döküldüğü için belirlenen ihtiyaçlar daha iyi karşılanmaktadır.
+- Geliştiriciler işleyişi daha iyi öngörebildikleri için yazdıkları koda daha fazla güvenirler.
+
+### Agile test quadrant nedir ? Quadrant’ların kapsamını kısaca açıklayınız.
+
+  Test Türlerinin iki yönünü birleştiren aşağıdaki Agile Test Quandrants Brian Marick tarafından türetilmiştir. 
+  
+  ![](https://www.tutorialspoint.com/agile_testing/images/quadrants.jpg)
+  
+  Agile Test Quadrantları ekiplerin ihtiyaç duyulan testi belirlemesine, planlamasına ve uygulamasına yardımcı olmak için yararlı bir sınıflandırma sağlar.
+  
+  - Quadrant Q1- Unit Level, Technology Facing ve geliştiricileri destekler. Birim testleri bu quadranta aittir. Bu testler Otomatik testler olabilir.
+  - Quadrant Q2- Sistem düzeyi, işle ilgili durumlar ve ürün davranışına uygunluk. Fonksiyonel testler bu quadranta aittir. Bu testler manuel veya otomatiktir.
+  - Quadrant Q3- Sistem veya Kullanıcı Kabul Düzeyi, İşe Yönelik ve gerçek zamanlı senaryolara odaklanın. Kullanıcı Kabul Testleri bu quadranta aittir. Bu testler manueldir.
+  - Quadrant Q4- Sistem veya Operasyonel Kabul Düzeyi, Teknolojiyle Karşılaşma ve Performansa Odaklanma, Yük, Stres, Sürdürülebilirlik, Ölçeklenebilirlik Testleri. Otomasyon testi ile birlikte bu testler için özel araçlar kullanılabilir.
+
+  Bunları birleştirerek, Hangi test Ne Zaman'ı yansıtan Agile Test Quadrantları aşağıdaki gibi görselleştirilebilir.
+  
+  ![](https://www.tutorialspoint.com/agile_testing/images/testing_quadrants.jpg)
+  
+
+
