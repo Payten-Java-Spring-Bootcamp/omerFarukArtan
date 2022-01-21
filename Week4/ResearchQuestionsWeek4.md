@@ -106,4 +106,180 @@ Sahte sürüm gerçek gibi görünür ve davranır ancak birim testinizin başı
   
 #### Implementing a Unit Test
 
+  Java için de-facto standart test frameworkü olan JUnit'i kullanarak unit testlerini yazıyoruz. Testimiz için gerçek PersonRepository sınıfını bir taslak ile değiştirmek için Mockito kullanıyoruz. arrange, act, assert yapısını takiben iki unit test yazıyoruz - pozitif bir vaka ve aranan kişinin bulunamadığı bir vaka.
+
+### Integration Tests
+
+  Entegrasyon Testleri yardımcı olmak için vardır. Uygulamanızın dışında yaşayan tüm parçalarla uygulamanızın entegrasyonunu test ederler. Bir veritabanıyla entegrasyonu test ediyorsanız, testlerinizi çalıştırırken bir veritabanı çalıştırmanız gerekir. Entegrasyon testini daha dar bir şekilde ele almayı ve ayrı hizmetleri ve veritabanlarını test çiftleriyle değiştirerek her seferinde bir entegrasyon noktasını test etmeyi seviyorum. Bir veritabanı entegrasyon testi şöyle görünür:
   
+  ![](https://martinfowler.com/articles/practical-test-pyramid/dbIntegrationTest.png)
+  
+  1. Bir veritabanı kur.
+  2. Uygulamayı veritabanına bağla.
+  3. Kodun içinde veri tabanına veri yazan bir işlevi tetikleyin.
+  4. Uygulamanın yanıtı doğru şekilde ayrıştırabildiğini kontrol edin.
+
+  Verileri serialize ya da deserialize ettiğinizde tüm kod parçaları için entegrasyon testleri yazın. Bu çok fazla olur.
+  
+  - Servislerin apilerine yapılan çağrılarda
+  - Db den bir şey okuyup bir şey yazdığımızda
+  - Başka uygulamaların apilerini çağırdığımızda
+
+  Bu sınırlar etrafında entegrasyon testleri yazmak, bu harici ortak çalışanlara veri yazmanın ve onlardan veri okumanın sorunsuz çalışmasını sağlar.
+
+  Test piramidi ile ilgili olarak entegrasyon testleri, birim testlerinizden daha üst düzeydedir. 
+  
+#### Database Integration
+
+```
+public interface PersonRepository extends CrudRepository<Person, String> {
+    Optional<Person> findByLastName(String lastName);
+}
+```
+Bir kişiyi(Person) veritabanına kaydeden ve soyadına göre bulan basit bir entegrasyon testi:
+```
+@RunWith(SpringRunner.class)
+@DataJpaTest
+public class PersonRepositoryIntegrationTest {
+    @Autowired
+    private PersonRepository subject;
+
+    @After
+    public void tearDown() throws Exception {
+        subject.deleteAll();
+    }
+
+    @Test
+    public void shouldSaveAndFetchPerson() throws Exception {
+        Person peter = new Person("Peter", "Pan");
+        subject.save(peter);
+
+        Optional<Person> maybePeter = subject.findByLastName("Pan");
+
+        assertThat(maybePeter, is(Optional.of(peter)));
+    }
+}
+```
+#### Integration With Separate Services
+
+  Mikro hizmetimiz, bir hava durumu REST API'si olan darksky.net ile konuşuyor. Elbette hizmetimizin istek gönderdiğinden ve yanıtları doğru bir şekilde pars ettiğinden emin olmak istiyoruz. Entegrasyon testlerimizi yaparken kendi sahte darksky sunucumuzu çalıştırarak gerçek darksky sunucularına çarpmaktan kaçınabiliriz. Bu kulağa çok büyük bir görev gibi gelebilir. Wiremock gibi araçlar sayesinde çok kolay.
+  ```
+  @RunWith(SpringRunner.class)
+@SpringBootTest
+public class WeatherClientIntegrationTest {
+
+    @Autowired
+    private WeatherClient subject;
+
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(8089);
+
+    @Test
+    public void shouldCallWeatherService() throws Exception {
+        wireMockRule.stubFor(get(urlPathEqualTo("/some-test-api-key/53.5511,9.9937"))
+                .willReturn(aResponse()
+                        .withBody(FileLoader.read("classpath:weatherApiResponse.json"))
+                        .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .withStatus(200)));
+
+        Optional<WeatherResponse> weatherResponse = subject.fetchWeather();
+
+        Optional<WeatherResponse> expectedResponse = Optional.of(new WeatherResponse("Rain"));
+        assertThat(weatherResponse, is(expectedResponse));
+    }
+}
+  ```
+  Wiremock'u kullanmak için, sabit bir bağlantı noktasında (8089) bir WireMockRule başlatırız. DSL'yi kullanarak Wiremock sunucusunu kurabilir, dinlemesi gereken uç noktaları tanımlayabilir ve yanıt vermesi gereken hazır yanıtları ayarlayabiliriz.
+
+Ardından, test etmek istediğimiz yöntemi çağırırız, üçüncü taraf hizmeti çağırır ve sonucun doğru şekilde ayrıştırılıp ayrıştırılmadığını kontrol ederiz.
+
+gerçek sunucu yerine sahte Wiremock sunucusunu çağırmak için src/test/resources içindeki application.properties dosyamıza aşağıdakini eklememiz lazım.
+```
+weather.url = http://localhost:8089
+```
+  Testlerimizde gerçek hava durumu API'sinin URL'sini sahte bir URL ile değiştirmek, URL'yi WeatherClient sınıfımızın yapıcısına enjekte ederek mümkün olur:
+  
+```
+@Autowired
+public WeatherClient(final RestTemplate restTemplate,
+                     @Value("${weather.url}") final String weatherServiceUrl,
+                     @Value("${weather.api_key}") final String weatherServiceApiKey) {
+    this.restTemplate = restTemplate;
+    this.weatherServiceUrl = weatherServiceUrl;
+    this.weatherServiceApiKey = weatherServiceApiKey;
+}
+```
+Bu şekilde WeatherClient'ımıza, uygulama özelliklerimizde tanımladığımız weather.url özelliğinden weatherUrl parametresinin değerini okumasını söyleriz. Kurduğumuz sahte sunucunun gerçek sunucu gibi davranmasını nasıl sağlayabiliriz? Sahte sunucuya ve gerçek sunucuya karşı sözleşme testleri yapmak, entegrasyon testlerimizde kullandığımız sahte öğenin sadık bir test çifti olmasını sağlar. 
+
+### Contract Tests
+
+  Daha modern yazılım geliştirme kuruluşları, bir sistemin gelişimini farklı ekipler arasında yayarak geliştirme çabalarını ölçeklendirmenin yollarını bulmuşlardır. Bireysel ekipler, birbirlerinin ayaklarına basmadan bireysel, loosely coupled hizmetler oluşturur ve bu hizmetleri büyük, uyumlu bir sisteme entegre eder. Sisteminizi birçok küçük hizmete bölmek, genellikle bu hizmetlerin belirli arabirimler aracılığıyla birbirleriyle iletişim kurması gerektiği anlamına gelir.
+
+- REST and JSON via HTTPS
+- RPC using something like gRPC
+- Event-driven architecture using queues
+
+![](https://martinfowler.com/articles/practical-test-pyramid/contract_tests.png)
+
+  Tüketen ve sağlayan hizmetleri farklı ekipler arasında sıklıkla yayarken, kendinizi bu hizmetler arasındaki arabirimi (sözde sözleşme) açıkça belirtmeniz gereken bir durumda bulursunuz. Geleneksel olarak şirketler bu soruna şu şekilde yaklaşmışlardır:
+  
+  - Uzun ve ayrıntılı bir arayüz belirtimi yazın (sözleşme)
+  - Belirlenen sözleşmeye göre sağlama hizmetini uygulamak
+  - Arayüz spesifikasyonunu çitin üzerinden tüketen ekibe atın
+  - Arayüzü tüketme konusundaki rollerini uygulayana kadar bekleyin
+  - Her şeyin işe yarayıp yaramadığını görmek için büyük ölçekli manuel sistem testi yapın
+  - Umarım her iki takım da sonsuza kadar arayüz tanımına sadık kalır ve işleri batırmaz.
+
+  Daha modern yazılım geliştirme ekipleri otomatikleştirilmiş sözleşme testleri kullanırlar. Çevik bir organizasyonda, daha verimli ve daha az savurgan yolu seçmelisiniz. Uygulamalarınızı aynı organizasyon içinde oluşturursunuz. Çitin üzerinden aşırı ayrıntılı belgeler atmak yerine, diğer hizmetlerin geliştiricileriyle doğrudan konuşmak gerçekten çok zor olmamalı.
+  
+  Tüketiciye Dayalı Sözleşme testleri (CDC testleri), tüketicilerin bir sözleşmenin uygulanmasını yönlendirmesine izin verir. CDC kullanarak, bir arabirimin tüketicileri, arabirimden ihtiyaç duydukları tüm veriler için arabirimi kontrol eden testler yazar. Tüketim ekibi daha sonra bu testleri yayınlar, böylece yayınlama ekibi bu testleri kolayca alabilir ve yürütebilir. Sağlayıcı ekip artık CDC testlerini çalıştırarak API'lerini geliştirebilir.
+  
+  ![](https://martinfowler.com/articles/practical-test-pyramid/cdc_tests.png)
+  
+  Bu yaklaşım, sağlayıcı ekibin yalnızca gerçekten gerekli olanı uygulamasına olanak tanır. Testler yeşil kaldığı sürece, ekip diğer ekipler için endişelenmeden istedikleri değişiklikleri yapabilir. Tüketici Odaklı Sözleşme yaklaşımı, sizi şuna benzeyen bir süreçle baş başa bırakır:
+  
+  - Tüketim ekibi, tüm tüketici beklentileriyle otomatik testler yazar.
+  - Sağlayıcı ekip için testleri yayınlarlar.
+  - Sağlayıcı ekip, CDC testlerini sürekli olarak çalıştırır ve onları yeşil tutar.
+  - CDC testleri bozulduğunda her iki takım da birbirleriyle konuşur.
+
+#### Consumer Test (our team)
+
+  Mikro hizmetimiz hava durumu API'sini kullanır. Bu nedenle, mikro hizmetimiz ile hava durumu hizmeti arasındaki sözleşmeye (API) ilişkin beklentilerimizi tanımlayan bir tüketici testi yazmak bizim sorumluluğumuzdur.
+  
+#### Provider Test (the other team)
+  
+  Sağlayıcı testi, hava durumu API'sini sağlayan kişiler tarafından uygulanmalıdır. darksky.net tarafından sağlanan genel bir API kullanıyoruz. Teorik olarak, darksky ekibi, uygulamaları ile hizmetimiz arasındaki sözleşmeyi ihlal etmediklerini kontrol etmek için sağlayıcı testini uygular.
+  
+#### Provider Test (our team)
+
+  Hizmetimiz ile hava durumu sağlayıcısı arasındaki sözleşmenin nasıl test edileceğini gördük. Bu arayüz ile hizmetimiz tüketici, hava durumu hizmeti sağlayıcı olarak hareket eder. Biraz daha düşününce hizmetimizin başkaları için bir sağlayıcı görevi gördüğünü göreceğiz: Başkaları tarafından tüketilmeye hazır birkaç uç nokta sunan bir REST API sağlıyoruz.
+  
+### UI Tests
+
+  Çoğu uygulamanın bir çeşit kullanıcı arayüzü vardır. Tipik olarak, web uygulamaları bağlamında bir web arayüzünden bahsediyoruz. İnsanlar genellikle bir REST API'sinin veya bir komut satırı arayüzünün, süslü bir web kullanıcı arayüzü kadar bir kullanıcı arayüzü olduğunu unutur.
+
+UI testleri, uygulamanızın kullanıcı arayüzünün doğru çalıştığını test eder. Kullanıcı girişi doğru eylemleri tetiklemeli, veriler kullanıcıya sunulmalı, UI durumu beklendiği gibi değişmelidir.
+
+![](https://martinfowler.com/articles/practical-test-pyramid/ui_tests.png)
+
+### End-to-End Tests
+  
+  Dağıtılan uygulamanızı kullanıcı arabirimi aracılığıyla test etmek, uygulamanızı test etmenin en uçtan uca yoludur. Daha önce açıklanan, web sürücüsüne dayalı UI testleri, uçtan uca testlere iyi bir örnektir.
+  
+  ![](https://martinfowler.com/articles/practical-test-pyramid/e2etests.png)
+  
+#### User Interface End-to-End Test
+
+  Uçtan uca testler için Selenium ve WebDriver protokolü birçok geliştirici için tercih edilen araçtır. Selenium ile beğendiğiniz bir tarayıcı seçebilir ve web sitenizi otomatik olarak aramasına izin verebilir, burayı ve burayı tıklayın, verileri girin ve kullanıcı arayüzünde değişiklik olup olmadığını kontrol edin.
+  
+#### REST API End-to-End Test
+  
+  Uygulamanızı test ederken bir grafik kullanıcı arabiriminden kaçınmak, uygulama yığınının geniş bir bölümünü kapsamaya devam ederken tam uçtan uca testlerden daha az kesintili testler bulmak için iyi bir fikir olabilir. Bu, uygulamanızın web arayüzü üzerinden test yapmak özellikle zor olduğunda kullanışlı olabilir. Belki bir web kullanıcı arayüzünüz bile yoktur, ancak bunun yerine bir REST API'si sunarsınız (çünkü bir yerde bu API ile konuşan tek bir sayfa uygulamanız vardır veya sadece güzel olan her şeyi hor gördüğünüz için).
+  
+### Conclusion
+  
+  Bu kadar! Bunun, yazılımınızı neden ve nasıl test etmeniz gerektiğini açıklamak için uzun ve zor bir okuma olduğunu biliyorum. Harika haber şu ki, bu bilgi oldukça zamansız ve ne tür bir yazılım oluşturduğunuzdan bağımsız. Bir mikro hizmet ortamı, IoT cihazları, mobil uygulamalar veya web uygulamaları üzerinde çalışıyor olmanız farketmez, bu makaledeki dersler bunların tümüne uygulanabilir.
+  
+---------------------------------------------------------------------
+
