@@ -14,7 +14,7 @@
    
 ## 3. Java’da Error ve Exception arasındaki fark nedir ? Throwable ile ilişkileri nasıldır ? Hangi tür durumlarda Error hangi tür durumlarda Exception meydana gelebilir ? Örneklerler açıklayınız.
   
-  Error sistemsel durumlardan kaynaklanır. Exceptionlar throwable iken errorları throw edemeyiz. sonsuz döngüye girilirse stackoverflow error alırız, olmayan bir indexe ulaşmaya çalışırsak indexOutOfBounds exception alırız.
+  İkisi de Throwabledan gelir. Error sistemsel durumlardan kaynaklanır. Exceptionları manipüle edebiliriz ama errorları manipüle edemeyiz. Sonsuz döngüye girilirse stackoverflow error alırız, olmayan bir indexe ulaşmaya çalışırsak indexOutOfBounds exception alırız.
   
 ## 4. Spring’te yer alan @Scheduled anotasyonunun kullanım amaçlarını ve kullanım şeklini açıklayınız.
 
@@ -65,5 +65,32 @@ public Future<String> asyncMethodWithReturnType() {
   
 ## 7. Entity ve Value Object kavramlarını Domain Driven Design (DDD) kapsamında açıklayınız.
   
+  DDD’da önemli bir kavram olan Entity, kendini diğer nesnelere nazaran tekilleştirebilmek için bir kimliğe(Id) sahip olan nesnelerdir. Entity, özünde Entity Framework’den aşina olunduğu gibi yeryüzündeki herhangi bir şey için modellenmiş nesnelere karşılık gelmektedir. Bahsedilen kimlik ise bu nesnelerin her biri için yaratıldığı süreçten itibaren diğerlerinden ayırmamızı sağlayan ve değişmeden taşınan Id değeridir.
+  DDD prensibini kullanan veya kullanmayan çoğu projede value object’ler farkında olunsun ya da olunmasın kullanılan temel DDD yapı taşlarıdır diyebiliriz.
+
+  Value object, herhangi bir kimlik(Id) değeri olmayan ve böylece aynı değerlere sahip iki value object nesnesinin değersel açıdan aynı olarak kabul edilebilir olmasını sağlayan ve dolayısıyla birbirlerinin yerine geçebilecekleri anlamına gelen bir nesnedir. İşte bu nedenle value object’ler her daim değişmez(immutable)dirler
+  
+## 8. Ubiquitous Language kavramını DDD kapsamında açıklayınız. Sizce neden önemli olabileceğini belirtiniz.
+
+  Yazılım ekibi ile domain expert’leri arasında ortak ve açık bir dilin kurulması için kullanılır. Ortak dilin açık olması sayesinde gereksinimler üzerindeki belirsizlikler giderilmiş olacaktır. Ortak bir dil belirlemek test süreçlerini kolaylaştıracağı gibi gereksinimlerin değişmesi durumunda yazılım takımının bu değişiklikleri kolay anlayabilmesini sağlar.
+  
+## 9. Core Domain, Supporting Domain, Generic Domain kavramlarını DDD kapsamında açıklayınız.
+  
+  Çekirdek alan, iş için o kadar kritik ve temeldir ki, size rekabet avantajı sağlar ve işin arkasındaki temel kavramdır. Bu, en deneyimli insanlarınızın karmaşık  teknik veya altyapı sorunlarıyla uğraşmak yerine üzerinde çalışmasını istediğiniz alandır.
+  
+  Bu tür parçalar ayrıca, doğrudan işletmenin yaptığıyla ilgili yardımcı veya daha doğrusu destekleyici işlevlerin yerine getirilmesine yardımcı oldukları için gereklidir. Bu durumlarda, yüksek kaliteli kod ve mükemmel tasarlanmış yapı gerekli değildir.
   
   
+  Bir kurumsal uygulama yazarken veya yeniden yazarken, sistemin işini kolaylaştıran, ancak işin özü olmayan bölümleri olacaktır. Örneğin, çoğu işletmede müşterilere fatura göndermek olan bir faturalandırma kavramı vardır. Bu kritik bir iş konsepti olsa da, işin "temel"i değildir.
+  
+## 10. Anemic Domain Model ve Rich Domain Model kavramlarını kıyaslayarak açıklayınız.
+
+  Anemik Domain Modeli, içinde mantığı olmayan bir modeldir. Etki alanı sınıfları, sınıfın istemcisinin, sınıfın nasıl başlatılacağı ve değiştirileceği üzerinde kontrole sahip olduğu, etki alanı mantığı olmayan bir grup genel ayarlayıcı ve alıcıya benzer. Bu modellerde müşteri, sınıfın amacını ve kullanımını yorumlamalıdır. Genellikle mantık, hizmetler, yardımcı veya yönetici ve etki alanı sınıfının adı gibi bir şey olarak adlandırılan diğer sınıflara itilir. Mantık başka bir sınıfta otururken, müşterinin model sınıfında gezinmesine veya kullanmasına yardımcı olacak hiçbir şey yoktur.
+  - Encapsulation ihlal edilmiş oluyor.
+  - Bakımı zor.
+  - Business logic duplica oluyor.
+  - Modeldeki varlıkların tutarlı bir durumda olduğundan emin olamıyoruz.
+  - Düşük cohesion.
+  - Geliştirme ve iş dünyası arasında boşluğa ve yanlış anlaşılmaya sebep oluyor.
+  
+  Anemik Domain Modellerinin ana dezavantajlarını ele almanın iyi bir yolu, Rich Domain Modeli uygulamaktır. Anemik Domain Modeli ile arasındaki temel fark domain logiciğimizin domain entitilerimizin, veri ve davranışımızın bir parçası olmasıdır. Bu mantık, varlığın nasıl başlatıldığını, doğrulandığını ve işletildiğini yönlendirir ve kontrol eder, böylece istemcinin tutarsız bir duruma sahip varlıklara sahip olmasını önler.
